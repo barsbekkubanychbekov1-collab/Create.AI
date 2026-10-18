@@ -1,0 +1,664 @@
+
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#0b0b12">
+  <meta name="description" content="CREATE AI — личный центр управления ИИ-командой">
+  <title>CREATE AI — твоя ИИ-команда</title>
+
+  <style>
+    :root {
+      color-scheme: dark;
+      --bg: #0b0b12;
+      --panel: #12121d;
+      --panel2: #191927;
+      --border: #29293b;
+      --text: #f4f2ff;
+      --muted: #9291a8;
+      --purple: #9675ff;
+      --cyan: #68d9ff;
+      --green: #61e6b1;
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      background:
+        radial-gradient(ellipse at 70% 0%, #242047 0%, transparent 42%),
+        var(--bg);
+      color: var(--text);
+      font-family: system-ui, -apple-system, sans-serif;
+    }
+
+    button, textarea { font: inherit; }
+    button { cursor: pointer; }
+    button:focus-visible, textarea:focus-visible {
+      outline: 2px solid var(--purple);
+      outline-offset: 3px;
+    }
+
+    .app {
+      width: min(100%, 1100px);
+      margin: auto;
+      padding: 20px;
+    }
+
+    header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      padding: 8px 0 22px;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 11px;
+    }
+
+    .logo {
+      display: grid;
+      place-items: center;
+      width: 44px;
+      height: 44px;
+      border-radius: 14px;
+      font-size: 22px;
+      font-weight: 900;
+      background: linear-gradient(135deg, #a68aff, #5e49c9);
+      box-shadow: 0 0 28px #8a68ff35;
+    }
+
+    h1 { font-size: 20px; margin: 0; letter-spacing: 1px; }
+    .subtitle { color: var(--muted); font-size: 12px; margin-top: 4px; }
+
+    .status {
+      border: 1px solid #3b594f;
+      background: #14231f;
+      color: var(--green);
+      border-radius: 30px;
+      padding: 7px 10px;
+      font-size: 11px;
+      white-space: nowrap;
+    }
+
+    .hero { padding: 28px 0 20px; }
+
+    .eyebrow {
+      color: var(--cyan);
+      text-transform: uppercase;
+      font-size: 11px;
+      letter-spacing: 2px;
+      font-weight: 750;
+    }
+
+    h2 {
+      margin: 10px 0;
+      font-size: clamp(27px, 5vw, 42px);
+      line-height: 1.12;
+      letter-spacing: -1px;
+    }
+
+    .hero p {
+      color: var(--muted);
+      line-height: 1.6;
+      font-size: 14px;
+      max-width: 590px;
+    }
+
+    .agents {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 12px;
+      margin: 22px 0;
+    }
+
+    .agent {
+      padding: 17px 14px;
+      border: 1px solid var(--border);
+      border-radius: 18px;
+      background: linear-gradient(145deg, #191927, #11111a);
+      min-width: 0;
+    }
+
+    .agent-icon {
+      display: grid;
+      place-items: center;
+      width: 40px;
+      height: 40px;
+      border-radius: 13px;
+      margin-bottom: 13px;
+      font-size: 20px;
+      font-weight: 800;
+    }
+
+    .gemini { background: #252449; color: #a7a5ff; }
+    .claude { background: #38251f; color: #ffb38c; }
+    .chatgpt { background: #1d342c; color: #82e7b5; }
+
+    .agent h3 { margin: 0 0 6px; font-size: 14px; }
+    .agent p { margin: 0; color: var(--muted); font-size: 12px; line-height: 1.5; }
+    .agent-state { display: block; margin-top: 13px; color: #aaa8c1; font-size: 10px; }
+
+    .workspace {
+      border: 1px solid var(--border);
+      border-radius: 22px;
+      overflow: hidden;
+      background: #101019eF;
+    }
+
+    .workspace-head {
+      padding: 17px 19px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 12px;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .workspace-head h3 { margin: 0; font-size: 15px; }
+    .workspace-head span { color: var(--muted); font-size: 11px; }
+
+    .prompt-area { padding: 17px; }
+
+    textarea {
+      width: 100%;
+      min-height: 116px;
+      resize: vertical;
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      background: #0c0c14;
+      color: var(--text);
+      padding: 15px;
+      line-height: 1.55;
+    }
+
+    textarea::placeholder { color: #69687d; }
+
+    .prompt-bottom {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 10px;
+      flex-wrap: wrap;
+      margin-top: 12px;
+    }
+
+    .hint { color: var(--muted); font-size: 11px; }
+
+    .primary, .secondary {
+      border: 0;
+      border-radius: 12px;
+      padding: 12px 16px;
+      font-weight: 750;
+      font-size: 13px;
+    }
+
+    .primary {
+      color: white;
+      background: linear-gradient(110deg, #8868f5, #6852d5);
+      box-shadow: 0 5px 24px #7c60ef25;
+    }
+
+    .primary:disabled { opacity: .5; cursor: wait; }
+
+    .secondary {
+      background: var(--panel2);
+      color: var(--text);
+      border: 1px solid var(--border);
+    }
+
+    .results { padding: 0 17px 17px; }
+    .results[hidden] { display: none; }
+
+    .results-title {
+      display: flex;
+      justify-content: space-between;
+      gap: 10px;
+      align-items: center;
+      padding: 15px 0;
+      border-top: 1px solid var(--border);
+      font-size: 13px;
+      font-weight: 750;
+    }
+
+    .result-card {
+      background: #171722;
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 15px;
+      margin-top: 10px;
+    }
+
+    .result-card h4 { margin: 0 0 10px; font-size: 13px; }
+    .result-card p {
+      color: #d0cede;
+      font-size: 13px;
+      line-height: 1.7;
+      white-space: pre-wrap;
+      overflow-wrap: anywhere;
+      margin: 0;
+    }
+
+    .result-card .tag {
+      display: inline-block;
+      color: var(--cyan);
+      font-size: 10px;
+      margin-bottom: 8px;
+    }
+
+    .final-card {
+      border-color: #5c4b9e;
+      background: linear-gradient(135deg, #211c39, #151521);
+    }
+
+    .notice {
+      padding: 13px 15px;
+      margin-top: 14px;
+      border-radius: 12px;
+      background: #191923;
+      color: var(--muted);
+      border: 1px solid var(--border);
+      font-size: 11px;
+      line-height: 1.6;
+    }
+
+    .notice strong { color: #e5dfff; }
+
+    .history { margin-top: 24px; }
+    .history-head {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .history-head h3 { font-size: 15px; }
+    .history-list { display: grid; gap: 9px; }
+
+    .history-item {
+      text-align: left;
+      width: 100%;
+      padding: 13px;
+      color: var(--text);
+      background: var(--panel);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      overflow-wrap: anywhere;
+    }
+
+    .history-item small {
+      display: block;
+      color: var(--muted);
+      font-size: 10px;
+      margin-top: 6px;
+    }
+
+    .empty { color: var(--muted); font-size: 12px; padding: 12px 0; }
+
+    footer {
+      text-align: center;
+      padding: 30px 0 15px;
+      color: #77758d;
+      font-size: 11px;
+      line-height: 1.7;
+    }
+
+    @media (max-width: 560px) {
+      .app { padding: 14px; }
+      header { align-items: flex-start; }
+      h1 { font-size: 17px; }
+      .status { font-size: 9px; padding: 6px 8px; }
+      .agents { grid-template-columns: 1fr; gap: 9px; }
+      .agent {
+        display: grid;
+        grid-template-columns: 40px 1fr;
+        column-gap: 12px;
+        padding: 13px;
+      }
+      .agent-icon { grid-row: span 2; margin: 0; }
+      .agent h3 { align-self: end; }
+      .agent-state { grid-column: 2; margin-top: 5px; }
+      .workspace-head { padding: 14px; }
+      .prompt-area { padding: 12px; }
+      .results { padding: 0 12px 12px; }
+      .primary { width: 100%; }
+    }
+  </style>
+</head>
+
+<body>
+  <main class="app">
+    <header>
+      <div class="brand">
+        <div class="logo">C</div>
+        <div>
+          <h1>CREATE AI</h1>
+          <div class="subtitle">Твоя личная ИИ-команда</div>
+        </div>
+      </div>
+      <div class="status">● Система запущена</div>
+    </header>
+
+    <section class="hero">
+      <div class="eyebrow">ТВОЯ ЛАБОРАТОРИЯ ИДЕЙ</div>
+      <h2>Одна задача.<br>Три взгляда. Один план.</h2>
+      <p>
+        Формулируй идею, анализируй варианты и превращай
+        мысли в конкретные шаги для развития CREATE.
+      </p>
+    </section>
+
+    <section class="agents" aria-label="ИИ-команда">
+      <article class="agent">
+        <div class="agent-icon gemini">✦</div>
+        <h3>Gemini</h3>
+        <p>Аналитик. Идеи, рынок и возможности.</p>
+        <span class="agent-state">Этап 1 · Анализ</span>
+      </article>
+      <article class="agent">
+        <div class="agent-icon claude">⌘</div>
+        <h3>Claude</h3>
+        <p>Разработчик. Структура, решения и реализация.</p>
+        <span class="agent-state">Этап 2 · Разработка</span>
+      </article>
+      <article class="agent">
+        <div class="agent-icon chatgpt">◎</div>
+        <h3>ChatGPT</h3>
+        <p>Стратег. Проверка плана и следующие шаги.</p>
+        <span class="agent-state">Этап 3 · Итог</span>
+      </article>
+    </section>
+
+    <section class="workspace">
+      <div class="workspace-head">
+        <h3>Рабочее пространство</h3>
+        <span>CREATE / CORE</span>
+      </div>
+
+      <div class="prompt-area">
+        <label for="task" class="hint">ОПИШИ СВОЮ ЗАДАЧУ</label>
+        <textarea id="task" maxlength="3000"
+          placeholder="Например: придумай план, как найти первых клиентов на создание сайтов в Манасе с бюджетом 0 сом..."></textarea>
+
+        <div class="prompt-bottom">
+          <span class="hint">До 3000 символов · Русский язык</span>
+          <button id="run" class="primary">Запустить команду →</button>
+        </div>
+      </div>
+
+      <section id="results" class="results" hidden aria-live="polite">
+        <div class="results-title">
+          <span>Результаты команды</span>
+          <button id="copy" class="secondary">Копировать итог</button>
+        </div>
+        <div id="output"></div>
+      </section>
+    </section>
+
+    <section class="history">
+      <div class="history-head">
+        <h3>История задач</h3>
+        <button id="clear" class="secondary">Очистить</button>
+      </div>
+      <div id="historyList" class="history-list"></div>
+    </section>
+
+    <div class="notice">
+      <strong>Режим первой версии:</strong> демонстрационный.
+      Ответы формируются локальными шаблонами, а не настоящими
+      моделями Gemini, Claude и ChatGPT. API-ключи не используются.
+      История хранится только в локальном хранилище этого браузера.
+    </div>
+
+    <footer>
+      CREATE AI · VERSION 1.0<br>
+      Создано для идей, экспериментов и роста CREATE.
+    </footer>
+  </main>
+
+  <script>
+    const $ = (selector) => document.querySelector(selector);
+
+    const taskInput = $("#task");
+    const runButton = $("#run");
+    const results = $("#results");
+    const output = $("#output");
+    const historyList = $("#historyList");
+
+    let lastFinal = "";
+    let tasks = loadTasks();
+
+    function loadTasks() {
+      try {
+        const value = JSON.parse(
+          localStorage.getItem("createAI.tasks") || "[]"
+        );
+        return Array.isArray(value) ? value.slice(0, 20) : [];
+      } catch {
+        return [];
+      }
+    }
+
+    function saveTasks() {
+      try {
+        localStorage.setItem("createAI.tasks", JSON.stringify(tasks));
+      } catch {
+        // Сайт продолжит работать, даже если хранилище недоступно.
+      }
+    }
+
+    function addCard(title, tag, text, final = false) {
+      const card = document.createElement("article");
+      card.className = "result-card" + (final ? " final-card" : "");
+
+      const label = document.createElement("span");
+      label.className = "tag";
+      label.textContent = tag;
+
+      const heading = document.createElement("h4");
+      heading.textContent = title;
+
+      const paragraph = document.createElement("p");
+      paragraph.textContent = text;
+
+      card.append(label, heading, paragraph);
+      output.appendChild(card);
+    }
+
+    function makePlan(task) {
+      const lower = task.toLowerCase();
+      const isWebsite = /сайт|веб|html|css|код|лендинг/.test(lower);
+      const isMarketing = /клиент|продаж|реклам|reels|рилс|инстаграм|бизнес/.test(lower);
+
+      const analysis = [
+        "ЗАДАЧА\n" + task,
+        "",
+        "1. Цель",
+        "Сформулировать измеримый результат, к которому нужно прийти.",
+        "",
+        "2. Ограничения",
+        "Учитывать бюджет, доступное время и инструменты.",
+        "",
+        "3. Что нужно проверить",
+        "Спрос, целевую аудиторию, риски и критерии успеха.",
+        "",
+        "4. Первый эксперимент",
+        "Начать с небольшого действия, которое можно проверить без крупных затрат."
+      ].join("\n");
+
+      const development = isWebsite
+        ? [
+            "ПЛАН РАЗРАБОТКИ",
+            "1. Определить аудиторию и основное действие посетителя.",
+            "2. Собрать структуру страницы и прототип.",
+            "3. Реализовать адаптивный HTML/CSS/JavaScript.",
+            "4. Проверить мобильный экран, ссылки и формы.",
+            "5. Опубликовать демоверсию и собрать обратную связь.",
+            "",
+            "Результат: проверяемый прототип сайта."
+          ].join("\n")
+        : isMarketing
+        ? [
+            "ПЛАН ПРОДВИЖЕНИЯ",
+            "1. Определить конкретную аудиторию.",
+            "2. Подготовить предложение с понятной выгодой.",
+            "3. Создать демонстрационный пример работы.",
+            "4. Публиковать полезные материалы и показывать процесс.",
+            "5. Отслеживать отклики и улучшать предложение.",
+            "",
+            "Результат: небольшой проверяемый эксперимент по привлечению клиентов."
+          ].join("\n")
+        : [
+            "ПЛАН РЕАЛИЗАЦИИ",
+            "1. Разбить задачу на небольшие этапы.",
+            "2. Определить инструменты и необходимые ресурсы.",
+            "3. Выполнить простейшую рабочую версию.",
+            "4. Проверить результат по конкретным критериям.",
+            "5. Исправить недостатки и определить следующий шаг.",
+            "",
+            "Результат: первая версия, которую можно проверить."
+          ].join("\n");
+
+      const final = [
+        "РЕКОМЕНДУЕМЫЙ ПОРЯДОК ДЕЙСТВИЙ",
+        "",
+        "Шаг 1. Запиши, какой результат должен получиться.",
+        "Шаг 2. Выбери самое простое решение.",
+        "Шаг 3. Сделай первый вариант без лишних расходов.",
+        "Шаг 4. Проверь результат на практике.",
+        "Шаг 5. Улучши его на основе обратной связи.",
+        "",
+        "КРИТЕРИЙ УСПЕХА",
+        "Заранее выбери один измеримый показатель, по которому поймёшь, что задача выполнена.",
+        "",
+        "ВАЖНО",
+        "Это предварительный план, созданный локально. Он не проверен реальными ИИ-моделями и не заменяет исследование рынка."
+      ].join("\n");
+
+      return { analysis, development, final };
+    }
+
+    function renderHistory() {
+      historyList.replaceChildren();
+
+      if (!tasks.length) {
+        const empty = document.createElement("p");
+        empty.className = "empty";
+        empty.textContent = "Пока нет задач. Твои запуски появятся здесь.";
+        historyList.appendChild(empty);
+        return;
+      }
+
+      tasks.forEach((item) => {
+        const button = document.createElement("button");
+        button.className = "history-item";
+        button.textContent = item.task;
+
+        const date = document.createElement("small");
+        date.textContent = item.date;
+        button.appendChild(date);
+
+        button.addEventListener("click", () => {
+          taskInput.value = item.task;
+          lastFinal = item.final;
+          output.replaceChildren();
+          addCard("Gemini · Анализ", "ЭТАП 1", item.analysis);
+          addCard("Claude · Разработка", "ЭТАП 2", item.development);
+          addCard("ChatGPT · Итог", "ЭТАП 3", item.final, true);
+          results.hidden = false;
+          results.scrollIntoView({ behavior: "smooth", block: "start" });
+        });
+
+        historyList.appendChild(button);
+      });
+    }
+
+    runButton.addEventListener("click", () => {
+      const task = taskInput.value.trim();
+
+      if (!task) {
+        taskInput.focus();
+        taskInput.placeholder = "Сначала напиши задачу...";
+        return;
+      }
+
+      if (task.length > 3000) return;
+
+      runButton.disabled = true;
+      runButton.textContent = "Обрабатываем...";
+      output.replaceChildren();
+      results.hidden = false;
+
+      // Это локальная демонстрация этапов, а не вызовы API.
+      const plan = makePlan(task);
+
+      addCard("Gemini · Анализ задачи", "ЭТАП 1 / АНАЛИТИК", plan.analysis);
+      addCard("Claude · План реализации", "ЭТАП 2 / РАЗРАБОТЧИК", plan.development);
+      addCard("ChatGPT · Сводный план", "ЭТАП 3 / СТРАТЕГ", plan.final, true);
+
+      lastFinal = plan.final;
+
+      tasks.unshift({
+        task,
+        date: new Date().toLocaleString("ru-RU"),
+        analysis: plan.analysis,
+        development: plan.development,
+        final: plan.final
+      });
+
+      tasks = tasks.slice(0, 20);
+      saveTasks();
+      renderHistory();
+
+      runButton.disabled = false;
+      runButton.textContent = "Запустить команду →";
+      results.scrollIntoView({ behavior: "smooth", block: "start" });
+    });
+
+    $("#copy").addEventListener("click", async () => {
+      if (!lastFinal) return;
+
+      try {
+        await navigator.clipboard.writeText(lastFinal);
+        $("#copy").textContent = "Скопировано ✓";
+      } catch {
+        const field = document.createElement("textarea");
+        field.value = lastFinal;
+        document.body.appendChild(field);
+        field.select();
+
+        try {
+          document.execCommand("copy");
+          $("#copy").textContent = "Скопировано ✓";
+        } catch {
+          $("#copy").textContent = "Не удалось скопировать";
+        }
+
+        field.remove();
+      }
+
+      setTimeout(() => {
+        $("#copy").textContent = "Копировать итог";
+      }, 2000);
+    });
+
+    $("#clear").addEventListener("click", () => {
+      if (!tasks.length) return;
+      if (!confirm("Удалить локальную историю задач?")) return;
+
+      tasks = [];
+      saveTasks();
+      renderHistory();
+    });
+
+    renderHistory();
+  </script>
+</body>
+  </html>
+                                                   
